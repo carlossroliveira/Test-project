@@ -1,9 +1,9 @@
 import { Layout } from "../components/Layout";
 
-export const Routes = () => {
+export const RoutesComponent = () => {
   return (
     <>
-      <Layout />
-    </>
+    <Layout />
+  </>
   );
 };

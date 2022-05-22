@@ -1,10 +1,14 @@
 import { Form } from "../../Form";
 import { ContainerSC } from "./mainStyles";
 
-export const Main = () => {
+interface URLMain {
+  url: string;
+}
+
+export const Main = (props:URLMain) => {
   return (
     <ContainerSC>
-      <Form />
+      <Form url={props.url} />
     </ContainerSC>
   );
 };

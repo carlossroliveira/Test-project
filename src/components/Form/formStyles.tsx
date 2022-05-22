@@ -63,7 +63,25 @@ export const InputSC = styled.input`
 `;
 
 export const DivSC = styled.div`
+  position: relative;
   display: flex;
   justify-content: center;
   margin-top: 4rem;
+`;
+
+export const ParagraphLinkSC = styled.p`
+  position: absolute;
+  color: white;
+  top: 55px;
+  right: -6rem;
+  border: 1px solid white;
+  padding: 10px 1rem;
+  transition: filter 0.2s;
+  border-radius
+
+  &:hover {
+    cursor: pointer;
+    filter: brightness(0.9);
+    background-color: #4aa9da;
+  }
 `;

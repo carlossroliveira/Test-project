@@ -2,12 +2,16 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import axios from "axios";
-import { DivSC, InputMainSC, InputSC, ParagraphSC } from "./formStyles";
+import { DivSC, InputMainSC, InputSC, ParagraphLinkSC, ParagraphSC } from "./formStyles";
 import Swal from "sweetalert2";
-
+import { Link } from "react-router-dom";
 interface IFormInputs {
   name: string;
-  job: string;
+  password: string;
+}
+
+interface URLAxios {
+  url: string;
 }
 
 const schema = yup
@@ -16,14 +20,14 @@ const schema = yup
       .string()
       .required("Nome Obrigatório (a)")
       .min(3, "Deve ter no mínimo 3 caracteres"),
-    job: yup
+      password: yup
       .string()
       .required("Senha Obrigatório (a)")
       .min(6, "Deve ter no mínimo 6 caracteres"),
   })
   .required();
 
-export const Form = () => {
+export const Form = (props: URLAxios) => {
   const {
     register,
     handleSubmit,
@@ -32,12 +36,11 @@ export const Form = () => {
     resolver: yupResolver(schema),
   });
 
-  /* http://localhost:4000/user/cadaster */
   const onSubmit = (data: IFormInputs) => {
     axios
-      .post("https://reqre", {
+      .post(props.url, {
         name: data?.name,
-        job: data?.job,
+        password: data?.password,
       })
       .then(function (response) {
         console.log(response, "success");
@@ -82,18 +85,26 @@ export const Form = () => {
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <InputMainSC {...register("name")} name="name" type="text" placeholder="Nome"/>
+        <InputMainSC
+          {...register("name")}
+          name="name"
+          type="text"
+          placeholder="Nome"
+        />
         <ParagraphSC>{errors.name?.message}</ParagraphSC>
 
         <InputMainSC
           type="number"
-          {...register("job", { pattern: /[\D]/g })}
-          name="job"
+          {...register("password", { pattern: /[\D]/g })}
+          name="password"
           placeholder="Senha"
         />
-        <ParagraphSC>{errors.job?.message}</ParagraphSC>
+        <ParagraphSC>{errors.password?.message}</ParagraphSC>
         <DivSC>
           <InputSC type="submit" />
+          <Link className="effect" to="/login">
+            <ParagraphLinkSC>Login</ParagraphLinkSC>
+          </Link>
         </DivSC>
       </form>
     </>

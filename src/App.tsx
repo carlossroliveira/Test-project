@@ -1,13 +1,11 @@
-import { Login } from './components/Login'
-import { Routes } from './routes'
+import { RoutesComponent } from './routes'
 import { GlobalStyle } from "./styles/GlobalStyles";
 
 export const App = () => {
   return (
     <>
       <GlobalStyle />
-      <Routes/>
-      <Login/>
+      <RoutesComponent/>
     </>
   );
 };

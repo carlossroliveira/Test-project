@@ -1,10 +1,14 @@
 import React from 'react'
 import { ContainerSC, TitleSC } from './headerStyles'
 
-export const Header = () => {
+interface HeaderProps {
+  title: string
+}
+
+export const Header = (props: HeaderProps) => {
   return (
     <ContainerSC>
-       <TitleSC>Cadastrar usuário</TitleSC>
+       <TitleSC>{props.title}</TitleSC>
     </ContainerSC>
   )
 }
