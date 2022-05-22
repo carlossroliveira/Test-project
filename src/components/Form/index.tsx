@@ -1,108 +1,101 @@
-import React, { ChangeEvent, useState, MouseEvent, useEffect } from "react";
-import { FormControl, InputAdornment } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import {
-  ButtonSC,
-  IconButtonSC,
-  InputLabelSC,
-  InputSC,
-  TextFieldSC,
-  TitleSC,
-} from "./formStyles";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import axios from "axios";
+import { DivSC, InputMainSC, InputSC, ParagraphSC } from "./formStyles";
+import Swal from "sweetalert2";
 
-interface State {
+interface IFormInputs {
   name: string;
-  password: string;
-  showPassword?: boolean;
+  job: string;
 }
 
+const schema = yup
+  .object({
+    name: yup
+      .string()
+      .required("Nome Obrigatório (a)")
+      .min(3, "Deve ter no mínimo 3 caracteres"),
+    job: yup
+      .string()
+      .required("Senha Obrigatório (a)")
+      .min(6, "Deve ter no mínimo 6 caracteres"),
+  })
+  .required();
+
 export const Form = () => {
-  const [sendForm, setSendForm] = useState<State>();
-  const [values, setValues] = useState<State>({
-    name: "",
-    password: "",
-    showPassword: false,
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormInputs>({
+    resolver: yupResolver(schema),
   });
 
-  const handleChange =
-    (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-      setValues({ ...values, [prop]: event.target.value });
-    };
+  /* http://localhost:4000/user/cadaster */
+  const onSubmit = (data: IFormInputs) => {
+    axios
+      .post("https://reqre", {
+        name: data?.name,
+        job: data?.job,
+      })
+      .then(function (response) {
+        console.log(response, "success");
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
 
-  const handleClickShowPassword = () => {
-    setValues({
-      ...values,
-      showPassword: !values.showPassword,
-    });
+        Toast.fire({
+          icon: "success",
+          title: "Cadastro realizado com sucesso!",
+        });
+      })
+      .catch(function (error) {
+        console.log(error, "error");
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+          },
+        });
+
+        Toast.fire({
+          icon: "error",
+          title: "Cadastro não realizado!",
+        });
+      });
   };
-
-  const handleMouseDownPassword = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    setSendForm({
-      ...values,
-    });
-  };
-
-  console.log(sendForm);
-
-  useEffect(() => {
-    const info = {
-      name: sendForm?.name,
-      password: sendForm?.password,
-    };
-
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(info),
-    };
-
-    fetch("http://localhost:4000/user/cadaster", requestOptions)
-      .then((response) => response.json())
-      .then((data) =>
-        setSendForm({
-          ...data,
-        })
-      );
-  }, [sendForm?.name, sendForm?.password]);
 
   return (
     <>
-      <TitleSC>Cadastrar usuário</TitleSC>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <InputMainSC {...register("name")} name="name" type="text" placeholder="Nome"/>
+        <ParagraphSC>{errors.name?.message}</ParagraphSC>
 
-      <TextFieldSC
-        onChange={handleChange("name")}
-        id="Name-basic"
-        label="Name"
-        variant="standard"
-      />
-
-      <FormControl sx={{ m: 1, width: "25ch" }} variant="standard">
-        <InputLabelSC htmlFor="standard-adornment-password">
-          Password
-        </InputLabelSC>
-        <InputSC
-          id="standard-adornment-password"
-          type={values.showPassword ? "text" : "password"}
-          value={values.password}
-          onChange={handleChange("password")}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButtonSC
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                onMouseDown={handleMouseDownPassword}
-              >
-                {values.showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButtonSC>
-            </InputAdornment>
-          }
+        <InputMainSC
+          type="number"
+          {...register("job", { pattern: /[\D]/g })}
+          name="job"
+          placeholder="Senha"
         />
-      </FormControl>
-
-      <ButtonSC variant="contained" onClick={handleMouseDownPassword}>
-        Send
-      </ButtonSC>
+        <ParagraphSC>{errors.job?.message}</ParagraphSC>
+        <DivSC>
+          <InputSC type="submit" />
+        </DivSC>
+      </form>
     </>
   );
 };
